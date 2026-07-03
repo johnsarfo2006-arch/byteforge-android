@@ -1,0 +1,35 @@
+name: Fix Icon Name
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '*.jpg'
+      - '*.png'
+
+jobs:
+  fix-icon:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Find and rename icon
+        run: |
+          # Find any .jpg or .png in root (not in www/)
+          for file in *.jpg *.png; do
+            if [ -f "$file" ]; then
+              echo "Found: $file"
+              mv "$file" www/icon.png
+              echo "Moved to www/icon.png"
+            fi
+          done
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add www/icon.png
+          git commit -m "Auto-fix: moved icon to www/icon.png" || echo "No changes to commit"
+          git push origin main
