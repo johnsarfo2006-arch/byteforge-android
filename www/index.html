@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ByteForge Academy — Learn to Code like a Pro💪</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Ace Editor -->
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/ace.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-python.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/theme-one_dark.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/ext-language_tools.js"></script>
+<!-- Pyodide (in-browser Python) -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
+<style>
+:root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a25;--tx1:#eaeaea;--tx2:#a0a0b0;--tx3:#ffffff;--accent:#00d4ff;--accent2:#7b2cbf;--success:#00ff88;--error:#ff4d6d;--warning:#ffd166;--radius:12px;--shadow:0 8px 32px rgba(0,0,0,.4)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx1);min-height:100vh;overflow-x:hidden}
+.app{max-width:100%;margin:0 auto;padding:16px}
+.header{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--bg3);margin-bottom:24px}
+.logo{font-size:24px;font-weight:900;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stats{display:flex;gap:12px;font-size:14px;color:var(--tx2)}
+.stat-item{background:var(--bg2);padding:6px 12px;border-radius:20px;display:flex;align-items:center;gap:4px}
+.stat-icon{font-size:16px}
+.welcome-screen{text-align:center;padding:40px 20px}
+.welcome-title{font-size:32px;font-weight:900;margin-bottom:16px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.welcome-subtitle{font-size:18px;color:var(--tx2);margin-bottom:32px;line-height:1.5}
+.setup-form{max-width:400px;margin:0 auto;text-align:left}
+.form-group{margin-bottom:20px}
+.form-label{display:block;font-size:14px;font-weight:600;margin-bottom:8px;color:var(--tx2)}
+.form-input,.form-select{width:100%;padding:12px 16px;background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);color:var(--tx1);font-size:16px;font-family:inherit}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,.2)}
+.btn{padding:12px 24px;border:none;border-radius:var(--radius);font-size:16px;font-weight:600;cursor:pointer;transition:all .2s ease}
+.btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:white}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,255,.3)}
+.btn-secondary{background:var(--bg2);color:var(--tx1);border:1px solid var(--bg3)}
+.btn-secondary:hover{background:var(--bg3)}
+.module-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:24px}
+.module-card{background:var(--bg2);border-radius:var(--radius);padding:20px;border:1px solid var(--bg3);cursor:pointer;transition:all .2s ease}
+.module-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:var(--shadow)}
+.module-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.module-title{font-size:18px;font-weight:700;color:var(--tx1)}
+.module-badge{background:var(--accent);color:black;font-size:12px;font-weight:700;padding:4px 8px;border-radius:12px}
+.module-desc{font-size:14px;color:var(--tx2);line-height:1.5;margin-bottom:16px}
+.module-progress{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.module-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s ease}
+.lesson-viewer{background:var(--bg2);border-radius:var(--radius);padding:20px;border:1px solid var(--bg3);margin-top:24px}
+.lesson-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.lesson-title{font-size:20px;font-weight:700;color:var(--tx1)}
+.lesson-nav{display:flex;gap:8px}
+.nav-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:none;color:var(--tx1);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{background:var(--accent);color:black}
+.lesson-content{line-height:1.8;color:var(--tx2)}
+.lesson-content h3{color:var(--tx1);margin:16px 0 8px;font-size:18px}
+.lesson-content p{margin-bottom:12px}
+.code-editor-container{margin-top:24px;background:var(--bg);border-radius:var(--radius);overflow:hidden;border:1px solid var(--bg3)}
+.editor-toolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--bg3)}
+.editor-tabs{display:flex;gap:8px}
+.tab{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--tx2)}
+.tab.active{background:var(--accent);color:black}
+.run-controls{display:flex;gap:8px}
+.run-btn{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.run-btn-run{background:var(--success);color:black}
+.run-btn-reset{background:var(--bg3);color:var(--tx1)}
+#editor{height:300px;font-size:14px;font-family:'JetBrains Mono',monospace}
+.output-panel{margin-top:16px;background:var(--bg);border-radius:var(--radius);padding:16px;border:1px solid var(--bg3)}
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.output-title{font-size:14px;font-weight:600;color:var(--tx2)}
+.clear-output{font-size:12px;color:var(--tx2);cursor:pointer;text-decoration:underline}
+#output{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-all}
+.success-msg{color:var(--success);font-weight:600}
+.error-msg{color:var(--error);font-weight:600}
+.profile-section{margin-top:32px;background:var(--bg2);border-radius:var(--radius);padding:24px;border:1px solid var(--bg3)}
+.profile-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(90deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:white}
+.profile-info h2{font-size:24px;font-weight:800;color:var(--tx1)}
+.profile-info p{font-size:14px;color:var(--tx2)}
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:12px;margin-top:16px}
+.badge{background:var(--bg3);border-radius:var(--radius);padding:16px;text-align:center;transition:all .2s ease}
+.badge:hover{transform:scale(1.05);border-color:var(--accent)}
+.badge-icon{font-size:24px;margin-bottom:8px}
+.badge-name{font-size:12px;font-weight:600;color:var(--tx2)}
+.certificates-section{margin-top:32px}
+.cert-card{background:var(--bg3);border-radius:var(--radius);padding:20px;margin-bottom:16px;border-left:4px solid var(--accent)}
+.cert-title{font-size:16px;font-weight:700;color:var(--tx1);margin-bottom:4px}
+.cert-date{font-size:12px;color:var(--tx2)}
+.hidden{display:none!important}
+.fade-in{animation:fadeIn .3s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+<div class="logo">🔥ByteForge🔥</div>
+<div class="stats">
+<div class="stat-item"><span class="stat-icon">⚡</span><span id="xpDisplay">0</span></div>
+<div class="stat-item"><span class="stat-icon">XP</span><span id="levelDisplay">1</span></div><div class="stat-item"><span class="stat-icon">💾</span><span id="bytesDisplay">0</span></div>
+</div>
+</header>
+<main id="mainContent">
+<section id="welcomeScreen" class="welcome-screen">
+<h1 class="welcome-title">ByteForge Academy</h1>
+<p class="welcome-subtitle">Learn real coding through epic adventures. Write Python — level up, earn badges, and build things that actually work.</p>
+<form id="setupForm" class="setup-form">
+<div class="form-group">
+<label class="form-label">Choose Your Codename</label>
+<input type="text" id="codenameInput" class="form-input" placeholder="e.g., CodeNinja, PixelWizard..." required>
+</div>
+<div class="form-group">
+<label class="form-label">Your Age</label>
+<select id="ageSelect" class="form-select">
+<option value="">Select age</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+<option value="13">13</option>
+<option value="14">14</option>
+<option value="15">15</option>
+<option value="16">16</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label">Experience</label>
+<select id="expSelect" class="form-select">
+<option value="">Select experience</option>
+<option value="beginner">Brand new — never coded!</option>
+<option value="intermediate">Tried a little (Scratch, etc.)</option>
+<option value="advanced">Written real code before</option>
+</select>
+</div>
+<button type="submit" class="btn btn-primary">🚀 Start My Adventure</button>
+</form>
+</section>
+<section id="dashboardScreen" class="hidden">
+<h2>Welcome! <span id="userGreeting"></span></h2>
+<p>Let's code!</p>
+<div class="module-map" id="moduleMap"></div>
+</section>
+<section id="lessonViewer" class="hidden">
+<div class="lesson-viewer">
+<div class="lesson-header">
+<h3 class="lesson-title" id="lessonTitle">Loading...</h3>
+<div class="lesson-nav">
+<button class="nav-btn" id="prevLessonBtn">←</button>
+<span id="lessonCounter">1/3</span>
+<button class="nav-btn" id="nextLessonBtn">→</button></div>
+</div>
+<div class="lesson-content" id="lessonContent"></div>
+<div class="code-editor-container">
+<div class="editor-toolbar">
+<div class="editor-tabs">
+<div class="tab active" data-tab="python">Python</div>
+</div>
+<div class="run-controls">
+<button class="run-btn run-btn-run" id="runCodeBtn">▶ Run Code</button>
+<button class="run-btn run-btn-reset" id="resetCodeBtn">↺ Reset</button>
+</div>
+</div>
+<div id="editor"></div>
+</div>
+<div class="output-panel">
+<div class="output-header">
+<span class="output-title">Output</span>
+<span class="clear-output" id="clearOutputBtn">Clear</span>
+</div>
+<div id="output"></div>
+</div>
+</div>
+</section>
+<section id="profileScreen" class="hidden">
+<div class="profile-section">
+<div class="profile-header">
+<div class="avatar" id="profileAvatar">🧑‍</div>
+<div class="profile-info">
+<h2 id="profileName">Coder</h2>
+<p id="profileLevel">Byte — Level 1</p>
+</div>
+</div>
+<div class="badges-grid" id="badgesGrid"></div>
+</div>
+<div class="certificates-section">
+<h3 style="margin-bottom:16px;font-size:18px;font-weight:700;color:var(--tx1)">🏆 Certificates</h3>
+<div id="certificatesList"></div>
+</div>
+</section>
+</main>
+</div>
+<script>
+// State management
+const S = {
+  user: { username: '', age: null, exp: 'beginner' },
+  xp: 0,
+  level: 1,
+  bytes: 0,
+  curMod: 0,  curLesson: 0,
+  certs: []
+};
+
+// Module data structure
+const MODULES = [
+  {
+    title: "Module 1: Hello World",
+    desc: "Start your journey with basic output",
+    lessons: [
+      {
+        title: "Say Hello!",
+        teach: { narrations: ["Welcome to ByteForge! Let's write your first program."], tip: "Use print() to show text on screen." },
+        try: { starter: "# Type your name below\nprint('Hello, I am ___')", hint: "Replace ___ with your actual name inside quotes.", test: (out) => out.includes("Hello") && out.length > 10 },
+        status: "locked"
+      },
+      {
+        title: "Math Magic",
+        teach: { narrations: ["Computers love math! Let's do some calculations."], tip: "You can use + - * / just like in school." },
+        try: { starter: "# Calculate 5 + 3\nprint(5 + 3)", hint: "Try changing the numbers to see different results.", test: (out) => !isNaN(parseFloat(out)) },
+        status: "locked"
+      },
+      {
+        title: "Story Time",
+        teach: { narrations: ["Now let's tell a story using code!"], tip: "Combine strings with variables using f-strings." },
+        try: { starter: "name = 'Hero'\nage = 12\nprint(f'{name} is {age} years old.')", hint: "Change name and age to make it about you!", test: (out) => out.includes("years old") },
+        status: "locked"
+      }
+    ]
+  },
+  {
+    title: "Module 2: Variables & Data",
+    desc: "Store information for later use",
+    lessons: [
+      {
+        title: "What are Variables?",
+        teach: { narrations: ["Variables are like labeled boxes that store data."], tip: "Give them clear names like score, name, or count." },
+        try: { starter: "score = 100\nprint(score)", hint: "Try assigning different values to score.", test: (out) => !isNaN(parseInt(out)) },
+        status: "locked"
+      },
+      {
+        title: "String Operations",
+        teach: { narrations: ["Strings are pieces of text. You can combine and change them!"], tip: "Use + to join strings together." },
+        try: { starter: "first = 'Byte'\nlast = 'Forge'\nprint(first + last)", hint: "Add a space between words using ' '.", test: (out) => out.includes("ByteForge") },
+        status: "locked"
+      },
+      {
+        title: "User Input",
+        teach: { narrations: ["Let users interact with your programs!"], tip: "input() gets text from the user." },
+        try: { starter: "name = input('Enter your name: ')\nprint('Hi ' + name)", hint: "Test by typing your name when prompted.", test: (out) => out.includes("Hi") },        status: "locked"
+      }
+    ]
+  }
+];
+
+// DOM Elements
+const els = {
+  welcomeScreen: document.getElementById('welcomeScreen'),
+  dashboardScreen: document.getElementById('dashboardScreen'),
+  lessonViewer: document.getElementById('lessonViewer'),
+  profileScreen: document.getElementById('profileScreen'),
+  setupForm: document.getElementById('setupForm'),
+  codenameInput: document.getElementById('codenameInput'),
+  ageSelect: document.getElementById('ageSelect'),
+  expSelect: document.getElementById('expSelect'),
+  moduleMap: document.getElementById('moduleMap'),
+  lessonTitle: document.getElementById('lessonTitle'),
+  lessonContent: document.getElementById('lessonContent'),
+  lessonCounter: document.getElementById('lessonCounter'),
+  prevLessonBtn: document.getElementById('prevLessonBtn'),
+  nextLessonBtn: document.getElementById('nextLessonBtn'),
+  editor: document.getElementById('editor'),
+  runCodeBtn: document.getElementById('runCodeBtn'),
+  resetCodeBtn: document.getElementById('resetCodeBtn'),
+  output: document.getElementById('output'),
+  clearOutputBtn: document.getElementById('clearOutputBtn'),
+  profileName: document.getElementById('profileName'),
+  profileLevel: document.getElementById('profileLevel'),
+  profileAvatar: document.getElementById('profileAvatar'),
+  badgesGrid: document.getElementById('badgesGrid'),
+  certificatesList: document.getElementById('certificatesList'),
+  xpDisplay: document.getElementById('xpDisplay'),
+  levelDisplay: document.getElementById('levelDisplay'),
+  bytesDisplay: document.getElementById('bytesDisplay'),
+  userGreeting: document.getElementById('userGreeting')
+};
+
+// Initialize Ace Editor
+let aceEditor = null;
+function initEditor() {
+  if (!aceEditor) {
+    aceEditor = ace.edit("editor");
+    aceEditor.setTheme("ace/theme/one_dark");
+    aceEditor.session.setMode("ace/mode/python");
+    aceEditor.setOptions({
+      fontSize: "14px",
+      showPrintMargin: false,
+      wrap: true,
+      enableBasicAutocompletion: true,      enableLiveAutocompletion: true
+    });
+  }
+  return aceEditor;
+}
+
+// Load saved state
+function loadState() {
+  try {
+    const saved = localStorage.getItem('byteforge_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      Object.assign(S, parsed);
+      return true;
+    }
+  } catch (e) {
+    console.error('Failed to load state:', e);
+  }
+  return false;
+}
+
+// Save current state
+function saveState() {
+  try {
+    localStorage.setItem('byteforge_state', JSON.stringify({
+      user: S.user,
+      xp: S.xp,
+      level: S.level,
+      bytes: S.bytes,
+      curMod: S.curMod,
+      curLesson: S.curLesson,
+      certs: S.certs
+    }));
+  } catch (e) {
+    console.error('Failed to save state:', e);
+  }
+}
+
+// Update UI displays
+function updateDisplays() {
+  els.xpDisplay.textContent = S.xp;
+  els.levelDisplay.textContent = S.level;
+  els.bytesDisplay.textContent = S.bytes;
+  
+  if (S.user.username) {
+    els.userGreeting.textContent = S.user.username + '!';
+    els.profileName.textContent = S.user.username;
+    els.profileAvatar.textContent = S.user.username.charAt(0).toUpperCase();
+  }
+    // Update profile level display
+  const levels = ['Byte', 'Bit', 'Nibble', 'Word', 'Dword', 'Qword', 'Mega', 'Giga', 'Tera'];
+  const lvlIdx = Math.min(Math.floor((S.level - 1) / 5), levels.length - 1);
+  els.profileLevel.textContent = `${levels[lvlIdx]} — Level ${S.level}`;
+}
+
+// Render module map
+function renderModuleMap() {
+  els.moduleMap.innerHTML = '';
+  MODULES.forEach((mod, idx) => {
+    const card = document.createElement('div');
+    card.className = 'module-card fade-in';
+    card.style.animationDelay = `${idx * 0.1}s`;
+    
+    const progress = mod.lessons.filter(l => l.status === 'completed').length / mod.lessons.length;
+    const badgeText = progress === 1 ? '✅ COMPLETE' : `${Math.round(progress * 100)}%`;
+    
+    card.innerHTML = `
+      <div class="module-header">
+        <h3 class="module-title">${mod.title}</h3>
+        <span class="module-badge">${badgeText}</span>
+      </div>
+      <p class="module-desc">${mod.desc}</p>
+      <div class="module-progress">
+        <div class="module-progress-bar" style="width:${progress * 100}%"></div>
+      </div>
+    `;
+    
+    card.addEventListener('click', () => {
+      S.curMod = idx;
+      S.curLesson = 0;
+      showLesson();
+    });
+    
+    els.moduleMap.appendChild(card);
+  });
+}
+
+// Show specific lesson
+function showLesson() {
+  const mod = MODULES[S.curMod];
+  const lesson = mod.lessons[S.curLesson];
+  
+  els.welcomeScreen.classList.add('hidden');
+  els.dashboardScreen.classList.add('hidden');
+  els.profileScreen.classList.add('hidden');
+  els.lessonViewer.classList.remove('hidden');
+  
+  els.lessonTitle.textContent = lesson.title;
+  els.lessonCounter.textContent = `${S.curLesson + 1}/${mod.lessons.length}`;  
+  // Build lesson content HTML
+  let contentHtml = '';
+  lesson.teach.narrations.forEach(n => {
+    contentHtml += `<p>${n}</p>`;
+  });
+  if (lesson.teach.tip) {
+    contentHtml += `<div style="background:rgba(0,212,255,.1);padding:12px;border-radius:8px;margin-top:12px;border-left:3px solid var(--accent)">💡 Hint: ${lesson.teach.tip}</div>`;
+  }
+  els.lessonContent.innerHTML = contentHtml;
+  
+  // Set up editor with starter code
+  const editor = initEditor();
+  editor.setValue(lesson.try.starter, -1);
+  editor.clearSelection();
+  
+  // Setup navigation buttons
+  els.prevLessonBtn.disabled = S.curLesson === 0;
+  els.nextLessonBtn.disabled = S.curLesson >= mod.lessons.length - 1;
+  
+  // Clear previous output
+  els.output.innerHTML = '';
+  
+  saveState();
+}
+
+// Navigate lessons
+els.prevLessonBtn.addEventListener('click', () => {
+  if (S.curLesson > 0) {
+    S.curLesson--;
+    showLesson();
+  }
+});
+
+els.nextLessonBtn.addEventListener('click', () => {
+  const mod = MODULES[S.curMod];
+  if (S.curLesson < mod.lessons.length - 1) {
+    S.curLesson++;
+    showLesson();
+  }
+});
+
+// Run code functionality
+let pyodideInstance = null;
+async function loadPyodideEnv() {
+  if (!pyodideInstance) {
+    try {
+      pyodideInstance = await loadPyodide();
+      await pyodideInstance.loadPackage(['micropip']);
+    } catch (err) {      els.output.innerHTML = `<span class="error-msg">Error loading Python environment: ${err.message}</span>`;
+    }
+  }
+  return pyodideInstance;
+}
+
+async function runCode() {
+  const code = initEditor().getValue();
+  els.output.innerHTML = '<span style="color:var(--tx2)">Running...</span>';
+  
+  try {
+    const pyodide = await loadPyodideEnv();
+    
+    // Capture stdout
+    let output = '';
+    pyodide.runPython(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+${code}
+output = sys.stdout.getvalue()
+`);
+    
+    const result = pyodide.globals.get('output');
+    output = typeof result === 'string' ? result : String(result);
+    
+    if (output.trim()) {
+      els.output.textContent = output;
+    } else {
+      els.output.innerHTML = '<span class="success-msg">Code ran successfully (no output)</span>';
+    }
+    
+    // Check if lesson is complete
+    const mod = MODULES[S.curMod];
+    const lesson = mod.lessons[S.curLesson];
+    if (lesson.test(output)) {
+      markLessonComplete();
+    }
+    
+  } catch (err) {
+    els.output.innerHTML = `<span class="error-msg">Error: ${err.message}</span>`;
+  }
+}
+
+els.runCodeBtn.addEventListener('click', runCode);
+
+// Reset code to starter
+els.resetCodeBtn.addEventListener('click', () => {
+  const mod = MODULES[S.curMod];
+  const lesson = mod.lessons[S.curLesson];  initEditor().setValue(lesson.try.starter, -1);
+  els.output.innerHTML = '';
+});
+
+// Clear output
+els.clearOutputBtn.addEventListener('click', () => {
+  els.output.innerHTML = '';
+});
+
+// Mark lesson as complete
+function markLessonComplete() {
+  const mod = MODULES[S.curMod];
+  const lesson = mod.lessons[S.curLesson];
+  
+  if (lesson.status !== 'completed') {
+    lesson.status = 'completed';
+    S.xp += 100;
+    S.bytes += 10;
+    
+    // Level up check
+    if (S.xp >= S.level * 200) {
+      S.level++;
+      alert(`🎉 LEVEL UP! You're now Level ${S.level}!`);
+    }
+    
+    // Show completion message
+    els.output.innerHTML += `\n\n<span class="success-msg">✅ Lesson Complete! +100 XP</span>`;
+    
+    // Auto advance after delay
+    setTimeout(() => {
+      if (S.curLesson < mod.lessons.length - 1) {
+        S.curLesson++;
+        showLesson();
+      } else {
+        // Module complete
+        addCertificate(mod.title);
+        alert(`🏆 Module Complete! Certificate earned!`);
+        showDashboard();
+      }
+    }, 1500);
+    
+    saveState();
+    updateDisplays();
+  }
+}
+
+// Add certificate
+function addCertificate(moduleTitle) {
+  const cert = {
+    title: moduleTitle,    date: new Date().toLocaleDateString(),
+    xp: 500
+  };
+  S.certs.push(cert);
+  renderCertificates();
+  saveState();
+}
+
+// Render certificates
+function renderCertificates() {
+  els.certificatesList.innerHTML = '';
+  if (S.certs.length === 0) {
+    els.certificatesList.innerHTML = '<p style="color:var(--tx2);text-align:center;padding:20px">No certificates yet. Complete modules to earn them!</p>';
+    return;
+  }
+  
+  S.certs.forEach(cert => {
+    const card = document.createElement('div');
+    card.className = 'cert-card fade-in';
+    card.innerHTML = `
+      <h4 class="cert-title">${cert.title}</h4>
+      <p class="cert-date">Earned on ${cert.date} • +${cert.xp} XP</p>
+    `;
+    els.certificatesList.appendChild(card);
+  });
+}
+
+// Show dashboard
+function showDashboard() {
+  els.welcomeScreen.classList.add('hidden');
+  els.lessonViewer.classList.add('hidden');
+  els.profileScreen.classList.add('hidden');
+  els.dashboardScreen.classList.remove('hidden');
+  renderModuleMap();
+  updateDisplays();
+}
+
+// Show profile
+function showProfile() {
+  els.welcomeScreen.classList.add('hidden');
+  els.dashboardScreen.classList.add('hidden');
+  els.lessonViewer.classList.add('hidden');
+  els.profileScreen.classList.remove('hidden');
+  renderBadges();
+  renderCertificates();
+  updateDisplays();
+}
+
+// Render badges
+function renderBadges() {  els.badgesGrid.innerHTML = '';
+  const badges = [
+    { icon: '🚀', name: 'First Step', condition: S.xp >= 100 },
+    { icon: '🔢', name: 'Math Wizard', condition: S.xp >= 300 },
+    { icon: '📚', name: 'Bookworm', condition: S.certs.length >= 1 },
+    { icon: '⭐', name: 'Star Coder', condition: S.level >= 5 },
+    { icon: '🏆', name: 'Champion', condition: S.certs.length >= 3 }
+  ];
+  
+  badges.forEach(badge => {
+    const div = document.createElement('div');
+    div.className = `badge ${badge.condition ? 'active' : ''}`;
+    div.innerHTML = `
+      <div class="badge-icon">${badge.icon}</div>
+      <div class="badge-name">${badge.name}</div>
+    `;
+    els.badgesGrid.appendChild(div);
+  });
+}
+
+// Handle form submission
+els.setupForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  
+  const username = els.codenameInput.value.trim();
+  const age = parseInt(els.ageSelect.value);
+  const exp = els.expSelect.value;
+  
+  if (!username || !age || !exp) {
+    alert('Please fill in all fields!');
+    return;
+  }
+  
+  S.user = { username, age, exp };
+  saveState();
+  showDashboard();
+});
+
+// Navigation handlers
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.id === 'prevLessonBtn') {
+      els.prevLessonBtn.click();
+    } else if (btn.id === 'nextLessonBtn') {
+      els.nextLessonBtn.click();
+    }
+  });
+});
+
+// Initialize appdocument.addEventListener('DOMContentLoaded', async () => {
+  const hasState = loadState();
+  
+  if (hasState && S.user.username) {
+    showDashboard();
+  } else {
+    els.welcomeScreen.classList.remove('hidden');
+  }
+  
+  updateDisplays();
+  
+  // Preload Pyodide in background
+  setTimeout(() => {
+    loadPyodideEnv().catch(console.error);
+  }, 1000);
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'Enter') {
+    runCode();
+  }
+});
+
+// Prevent accidental page close with unsaved changes
+window.addEventListener('beforeunload', (e) => {
+  if (els.lessonViewer.classList.contains('hidden') === false) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+</script>
+</body>
+</html>
